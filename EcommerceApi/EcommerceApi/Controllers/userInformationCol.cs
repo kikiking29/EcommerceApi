@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using EcommerceApi.Models;
 using EcommerceApi.ConnecDb;
 using System;
 using System.Data;
@@ -30,10 +31,10 @@ namespace EcommerceApi.Controllers
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
         [Route("Usersinformation")]
-        public List<UsersinforModels> Getusersdataall()
+        public List<usersModels> Getusersdataall()
         {
 
-            List<UsersinforModels> users = new List<UsersinforModels>();
+            List<usersModels> users = new List<usersModels>();
             try
             {
                 DataSet ds = new DataSet();
@@ -41,13 +42,14 @@ namespace EcommerceApi.Controllers
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    UsersinforModels user = new UsersinforModels()
+                    usersModels user = new usersModels()
                     {
-                        usersId = int.Parse(dr["usersId"].ToString()),
-                        username = dr["username"].ToString(),
-                        password = dr["passwrd"].ToString(),
-                        name = dr["name"].ToString(),
-                        status = dr["status"].ToString()
+                        id_users = int.Parse(dr["id_users"].ToString()),
+                        u_usersname = dr["u_usersname"].ToString(),
+                        u_password = dr["u_password"].ToString(),
+                        u_name = dr["u_name"].ToString(),
+                        u_email = dr["u_email"].ToString(),
+                        u_phonenumber = dr["u_phonenumber"].ToString()
 
                     };
                     users.Add(user);
@@ -64,9 +66,9 @@ namespace EcommerceApi.Controllers
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
         [Route("Usersinformation/{id}")]
-        public UsersinforModels Getbyusersid()
+        public usersModels Getbyusersid()
         {
-            UsersinforModels user = new UsersinforModels();
+            usersModels user = new usersModels();
 
             try
             {
@@ -78,13 +80,14 @@ namespace EcommerceApi.Controllers
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    user = new UsersinforModels()
+                    user = new usersModels()
                     {
-                        usersId = int.Parse(dr["usersId"].ToString()),
-                        username = dr["username"].ToString(),
-                        password = dr["passwrd"].ToString(),
-                        name = dr["name"].ToString(),
-                        status = dr["status"].ToString()
+                        id_users = int.Parse(dr["id_users"].ToString()),
+                        u_usersname = dr["u_usersname"].ToString(),
+                        u_password = dr["u_password"].ToString(),
+                        u_name = dr["u_name"].ToString(),
+                        u_email = dr["u_email"].ToString(),
+                        u_phonenumber = dr["u_phonenumber"].ToString()
 
                     };
                 }
@@ -97,54 +100,12 @@ namespace EcommerceApi.Controllers
         }
 
 
-        [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpGet]
-        [Route("Usersinformation/privileage")]
-        public List<UsersinforAndPrivileageModels> Getalluserandprivileage()
-        {
-            List<UsersinforAndPrivileageModels> uaps = new List<UsersinforAndPrivileageModels>();
-
-            try
-            {
-
-                DataSet ds = new DataSet();
-                ds = conn.Selectdata("SELECT * FROM users  JOIN privileage ON privileage.usersId = users.usersId;");
-
-
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                {
-                    UsersinforAndPrivileageModels uap = new UsersinforAndPrivileageModels()
-                    {
-                        u_usersId = int.Parse(dr["usersId"].ToString()),
-                        username = dr["username"].ToString(),
-                        password = dr["passwrd"].ToString(),
-                        name = dr["name"].ToString(),
-                        status = dr["status"].ToString(),
-                        privileageId = int.Parse(dr["privileageId"].ToString()),
-                        p_usersId = int.Parse(dr["usersId"].ToString()),
-                        canread = dr["canread"].ToString(),
-                        caninsert = dr["caninsert"].ToString(),
-                        canupdate = dr["canupdate"].ToString(),
-                        candelete = dr["candelete"].ToString(),
-                        candrop = dr["candrop"].ToString(),
-                    };
-                    uaps.Add(uap);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            return uaps;
-        }
-
 
         //[Authorize(Roles = "Admin,SuperAdmin,Geust")]
         [HttpPost]
         [Route("UsersInformation")]
-        public NewUsersinforModels Registerusers(NewUsersinforModels data)
+        public newusersModels Registerusers(newusersModels data, newaddressModels dataads)
         {
-            PasswordModels pass = new PasswordModels();
             UserDto userDto = new UserDto();
             connecDb conn = new connecDb();
 
@@ -155,19 +116,34 @@ namespace EcommerceApi.Controllers
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
 
-                    string sql = "INSERT into users set username=@username,passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(@password))))),name=@name;";
+                    string sql = "INSERT into users set u_usersname=@u_usersname,u_password=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(@u_password))))),u_name=@u_name,u_email=@u_email,u_phonenumber=@u_phonenumber;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
-                    comm.Parameters.AddWithValue("@username", data.username);
-                    comm.Parameters.AddWithValue("@password", data.password);
-                    comm.Parameters.AddWithValue("@name", data.name);
+                    comm.Parameters.AddWithValue("@u_usersname", data.u_usersname);
+                    comm.Parameters.AddWithValue("@u_password", data.u_password);
+                    comm.Parameters.AddWithValue("@u_name", data.u_name);
+                    comm.Parameters.AddWithValue("@u_email", data.u_email);
+                    comm.Parameters.AddWithValue("@u_phonenumber", data.u_phonenumber);
                     comm.ExecuteNonQuery();
+
+                    PasswordModels pass = new PasswordModels();
+                    userDto.Username = data.u_usersname;
+                    userDto.Password = data.u_password;
+                    pass.id_users = conn.CheckIduser(userDto);
+                    string setAddress = "INSERT into address set @id_users='" + pass.id_users + "',a_province=@a_province,a_district=@a_district,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details;";
+                    MySqlCommand commads = new MySqlCommand(setAddress, connection);
+                    commads.Parameters.AddWithValue("@a_province", dataads.a_province);
+                    commads.Parameters.AddWithValue("@a_district", dataads.a_district);
+                    commads.Parameters.AddWithValue("@a_postalcode", dataads.a_postalcode);
+                    commads.Parameters.AddWithValue("@a_streetname", dataads.a_streetname);
+                    commads.Parameters.AddWithValue("@a_building", dataads.a_building);
+                    commads.Parameters.AddWithValue("@a_housenumber", dataads.a_housenumber);
+                    commads.Parameters.AddWithValue("@a_alley", dataads.a_alley);
+                    commads.Parameters.AddWithValue("@a_intersection", dataads.a_intersection); 
+                    commads.Parameters.AddWithValue("@a_locationurl", dataads.a_locationurl);
+                    commads.Parameters.AddWithValue("@a_details", dataads.a_locationurl);
+                    commads.ExecuteNonQuery();
                     connection.Close();
 
-                    userDto.Username = data.username;
-                    userDto.Password = data.password;
-                    pass.usersId = conn.CheckIduser(userDto);
-                    string setPrivileage = "INSERT into privileage set usersId='" + pass.usersId + "',canread='0',caninsert='0',canupdate='0',candelete='0',candrop='0';";
-                    conn.Setdata(setPrivileage);
                 }
             }
             catch (Exception ex)
@@ -175,12 +151,13 @@ namespace EcommerceApi.Controllers
                 Console.WriteLine(ex.Message);
             }
 
-            return new NewUsersinforModels
+            return new newusersModels
             {
-                username = data.username,
-                password = data.password,
-                name = data.name,
-                status = data.status,
+                u_usersname = data.u_usersname,
+                u_password = data.u_password,
+                u_name = data.u_name,
+                u_email = data.u_email,
+                u_phonenumber = data.u_phonenumber,
             };
         }
 
@@ -189,9 +166,9 @@ namespace EcommerceApi.Controllers
         [Authorize(Roles = "Admin,SuperAdmin,User")]
         [HttpPut]
         [Route("UsersInformation/{id}")]
-        public UsersinforModels Updateusers(UsersinforModels data)
+        public usersModels Updateusers(usersModels data)
         {
-            UsersinforModels user = new UsersinforModels();
+            usersModels user = new usersModels();
             connecDb conn = new connecDb();
             try
             {
@@ -202,24 +179,27 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE users SET username=@username,name=@name,status=@status  WHERE usersId=@usersId ;";
+                    string sql = "UPDATE users SET u_usersname=@u_usersname,u_name=@u_name,u_email=@u_email,u_phonenumber=@u_phonenumber  WHERE id_users=@id_users ;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
-                    comm.Parameters.AddWithValue("@usersId", User.FindFirstValue(ClaimTypes.Sid));
-                    comm.Parameters.AddWithValue("@username", User.FindFirstValue(ClaimTypes.Name).ToString());
-                    comm.Parameters.AddWithValue("@name", data.name);
-                    comm.Parameters.AddWithValue("@status", data.status);
+                    comm.Parameters.AddWithValue("@id_users", User.FindFirstValue(ClaimTypes.Sid));
+                    comm.Parameters.AddWithValue("@u_usersname", User.FindFirstValue(ClaimTypes.Name).ToString());
+                    comm.Parameters.AddWithValue("@u_name", data.u_name);
+                    comm.Parameters.AddWithValue("@u_email", data.u_email);
+                    comm.Parameters.AddWithValue("@u_phonenumber", data.u_phonenumber);
                     comm.ExecuteNonQuery();
                     connection.Close();
                 }
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
 
-            return new UsersinforModels
+            return new usersModels
             {
-                usersId = data.usersId,
-                username = data.username,
-                name = data.name,
-                status = data.status
+                id_users = data.id_users,
+                u_usersname = data.u_usersname,
+                u_password = data.u_password,
+                u_name = data.u_name,
+                u_email = data.u_email,
+                u_phonenumber = data.u_phonenumber,
             };
 
         }
@@ -238,14 +218,14 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE users SET passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(@password)))))  WHERE usersId=@id AND passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(@oldpassword))))) ;";
+                    string sql = "UPDATE users SET passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1(@password)))))  WHERE id_users=@id_users AND u_password=CONCAT('*',UPPER(SHA1(UNHEX(SHA1(@oldpassword))))) ;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     if (data.recheck_password != data.password)
                     {
                         return new PasswordModels { password = "Passwords are not the same." };
 
                     }
-                    comm.Parameters.AddWithValue("@id", User.FindFirstValue(ClaimTypes.Sid));
+                    comm.Parameters.AddWithValue("@id_users", User.FindFirstValue(ClaimTypes.Sid));
                     comm.Parameters.AddWithValue("@oldpassword", data.old_password);
                     comm.Parameters.AddWithValue("@password", data.password);
                     comm.ExecuteNonQuery();
@@ -254,54 +234,8 @@ namespace EcommerceApi.Controllers
 
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
-            return new PasswordModels { usersId = pass.usersId, password = data.password };
+            return new PasswordModels { id_users = pass.id_users, password = data.password };
         }
-
-
-        [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpPut]
-        [Route("UsersInformation/status/Active/{id}")]
-        public void upstatusActive(int id)
-        {
-            try
-            {
-                myParam uId = new myParam
-                {
-                    name = "@id",
-                    value = id
-                };
-                string sql = $"UPDATE users SET status='Active' WHERE usersId={uId.value};";
-
-                conn.Setdata(sql);
-            }
-            catch (Exception ex)
-            { Console.WriteLine(ex.Message); }
-
-        }
-
-
-        [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpPut]
-        [Route("UsersInformation/status/Inactive/{id}")]
-        public void upstatusInactive(int id)
-        {
-            try
-            {
-                myParam uId = new myParam
-                {
-                    name = "@id",
-                    value = id
-                };
-
-                string sql = $"UPDATE users SET status='Inactive' WHERE usersId={uId.value};";
-
-                conn.Setdata(sql);
-            }
-            catch (Exception ex)
-            { Console.WriteLine(ex.Message); }
-
-        }
-
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete]

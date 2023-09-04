@@ -1,13 +1,32 @@
 ﻿namespace EcommerceApi.Models
 {
-    public class stockModels
+    public class addressModels
     {
-        public int id_stock { get; set; }
-        public int id_category { get; set; }
-        public string? s_name { get; set; }
-        public int s_among { get; set; }
-        public int s_amongall { get; set; }
-        public int s_unitprice { get; set; }
-        public string? s_description { get; set; }
+        public int id_address { get; set; }
+        public int id_users { get; set; }
+        public string? a_province { get; set; }
+        public int a_district { get; set; }
+        public int a_postalcode { get; set; }
+        public int a_streetname { get; set; }
+        public string? a_building { get; set; }
+        public string? a_housenumber { get; set; }
+        public string? a_alley { get; set; }
+        public string? a_intersection { get; set; }
+        public string? a_locationurl { get; set; }
+        public string? a_details { get; set; }
+    }
+    public class newaddressModels
+    {
+        public int id_users { get; set; }
+        public string? a_province { get; set; }
+        public int a_district { get; set; }
+        public int a_postalcode { get; set; }
+        public int a_streetname { get; set; }
+        public string? a_building { get; set; }
+        public string? a_housenumber { get; set; }
+        public string? a_alley { get; set; }
+        public string? a_intersection { get; set; }
+        public string? a_locationurl { get; set; }
+        public string? a_details { get; set; }
     }
 }
