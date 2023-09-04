@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using userInformation.Model;
-using userInformation.Services.UserService;
+using EcommerceApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using userInformation.ConnecDb;
-using userInformation.Entities;
+using EcommerceApi.ConnecDB;
+
 
 using AllowAnonymousAttribute = Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute;
 using Org.BouncyCastle.Ocsp;
@@ -16,20 +15,19 @@ namespace JwtWebApiTutorial.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class authCol : ControllerBase
     {
         private const string TicketIssuedTicks = nameof(TicketIssuedTicks);
 
 
         public static User user = new User();
         PasswordModels pass = new PasswordModels();
-        connecDb conn = new connecDb();
+        ConnecDb conn = new ConnecDb();
         private readonly IConfiguration _configuration;
-        private readonly IUserService _userService;
-        public AuthController( IConfiguration configuration, IUserService userService)
+
+        public authCol(IConfiguration configuration)
         {
             _configuration = configuration;
-            _userService = userService;
 
         }
 
@@ -113,13 +111,13 @@ namespace JwtWebApiTutorial.Controllers
             user.TokenCreated = newRefreshToken.Created;
             user.TokenExpires = newRefreshToken.Expires;
         }
-        
+
         private string CreateToken(User user)
         {
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha384);
-            user.Role = conn.Getrole(user.UserId);
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["AppSettings:Issuer"],
                 audience: _configuration["AppSettings:Audience"],
@@ -133,7 +131,7 @@ namespace JwtWebApiTutorial.Controllers
 
                 expires: DateTime.Now.AddHours(1),
                 signingCredentials: creds);
-          
+
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 

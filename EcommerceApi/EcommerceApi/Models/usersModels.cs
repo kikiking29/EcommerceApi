@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
 namespace EcommerceApi.Models
@@ -56,5 +57,21 @@ namespace EcommerceApi.Models
         [RegularExpression(@"^[a-zA-Z0-9_.#@]+", ErrorMessage = "Please enter a valid password")]
         public string? Password { get; set; }
     }
-  
+
+    public class User
+    {
+        public int UserId { get; set; }
+        public string Username { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
+        public string RefreshToken { get; set; } = string.Empty;
+        public DateTime TokenCreated { get; set; }
+        public DateTime TokenExpires { get; set; }
+
+        public string Role { get; set; }
+
+    }
+
 }

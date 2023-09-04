@@ -1,27 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using EcommerceApi.ConnecDB;
 using EcommerceApi.Models;
-using EcommerceApi.ConnecDb;
-using System;
-using System.Data;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using static System.Net.Mime.MediaTypeNames;
-using System.Xml.Linq;
-using System.Data.SqlClient;
-using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Authorization;
-
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
+using System.Data;
 using System.Security.Claims;
-//using userInformation.Authorization;
-//using AuthorizeAttribute = userInformation.Authorization.AuthorizeAttribute;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace EcommerceApi.Controllers
 {
-
-    public class userInformationCol : ControllerBase
+    public class userControllers
     {
-        connecDb conn = new connecDb();
+        ConnecDb conn = new ConnecDb();
         public class myParam
         {
             public string name;
@@ -107,7 +99,7 @@ namespace EcommerceApi.Controllers
         public newusersModels Registerusers(newusersModels data, newaddressModels dataads)
         {
             UserDto userDto = new UserDto();
-            connecDb conn = new connecDb();
+            ConnecDb conn = new ConnecDb();
 
             try
             {
@@ -129,7 +121,7 @@ namespace EcommerceApi.Controllers
                     userDto.Username = data.u_usersname;
                     userDto.Password = data.u_password;
                     pass.id_users = conn.CheckIduser(userDto);
-                    string setAddress = "INSERT into address set @id_users='" + pass.id_users + "',a_province=@a_province,a_district=@a_district,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details;";
+                    string setAddress = "INSERT into address set id_users='" + pass.id_users + "',a_province=@a_province,a_district=@a_district,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details;";
                     MySqlCommand commads = new MySqlCommand(setAddress, connection);
                     commads.Parameters.AddWithValue("@a_province", dataads.a_province);
                     commads.Parameters.AddWithValue("@a_district", dataads.a_district);
@@ -138,7 +130,7 @@ namespace EcommerceApi.Controllers
                     commads.Parameters.AddWithValue("@a_building", dataads.a_building);
                     commads.Parameters.AddWithValue("@a_housenumber", dataads.a_housenumber);
                     commads.Parameters.AddWithValue("@a_alley", dataads.a_alley);
-                    commads.Parameters.AddWithValue("@a_intersection", dataads.a_intersection); 
+                    commads.Parameters.AddWithValue("@a_intersection", dataads.a_intersection);
                     commads.Parameters.AddWithValue("@a_locationurl", dataads.a_locationurl);
                     commads.Parameters.AddWithValue("@a_details", dataads.a_locationurl);
                     commads.ExecuteNonQuery();
@@ -169,7 +161,7 @@ namespace EcommerceApi.Controllers
         public usersModels Updateusers(usersModels data)
         {
             usersModels user = new usersModels();
-            connecDb conn = new connecDb();
+            ConnecDb conn = new ConnecDb();
             try
             {
 
@@ -211,7 +203,7 @@ namespace EcommerceApi.Controllers
         public PasswordModels Updatepassword(PasswordModels data)
         {
             PasswordModels pass = new PasswordModels();
-            connecDb conn = new connecDb();
+            ConnecDb conn = new ConnecDb();
             try
             {
                 if (ModelState.IsValid)
@@ -237,6 +229,7 @@ namespace EcommerceApi.Controllers
             return new PasswordModels { id_users = pass.id_users, password = data.password };
         }
 
+
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete]
         [Route("UsersInformation/{id}")]
@@ -256,6 +249,5 @@ namespace EcommerceApi.Controllers
             { Console.WriteLine(ex.Message); }
 
         }
-
     }
 }

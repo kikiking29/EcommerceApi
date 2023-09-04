@@ -1,0 +1,73 @@
+﻿using EcommerceApi.Models;
+using MySql.Data.MySqlClient;
+using System.Data;
+
+namespace EcommerceApi.ConnecDB
+{
+    public class ConnecDb
+    {
+        string connectionstring = "Server=localhost;Database=userinformation;Uid=root;Pwd=1234;";
+        public string connectDb()
+        {
+            string connectionString = "Server=localhost;Database=userinformation;Uid=root;Pwd=1234;";
+            return connectionString;
+        }
+
+        public String Setdata(string Sql)
+        {
+            MySqlConnection connection = new MySqlConnection(connectionstring);
+            connection.Open();
+            MySqlCommand comm = new MySqlCommand(Sql, connection);
+            String result = Convert.ToString(comm.ExecuteNonQuery());
+            connection.Close();
+            return result;
+        }
+
+        public DataSet Selectdata(string Sql)
+        {
+            MySqlConnection connection = new MySqlConnection(connectionstring);
+            DataSet ds = new DataSet();
+            connection.Open();
+            MySqlDataAdapter dap = new MySqlDataAdapter(Sql, connection);
+            dap.Fill(ds);
+            connection.Close();
+            return ds;
+        }
+
+        public DataSet Selectitem(string Sql)
+        {
+            MySqlConnection connection = new MySqlConnection(connectionstring);
+            DataSet ds = new DataSet();
+            connection.Open();
+            if (Sql != null)
+            {
+                var db = "SELECT * FROM users WHERE TRUE";
+                MySqlDataAdapter dap = new MySqlDataAdapter(db + Sql + ";", connection);
+                dap.Fill(ds);
+            }
+            connection.Close();
+            return ds;
+        }
+
+
+        public int CheckIduser(UserDto data)
+        {
+            int id = 0;
+            PasswordModels passwrd = new PasswordModels();
+            MySqlConnection connection = new MySqlConnection(connectionstring);
+            DataSet ds = new DataSet();
+            connection.Open();
+            string Sql = "SELECT usersId FROM users where username='" + data.Username + "'AND passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1('" + data.Password + "')))));";
+            MySqlDataAdapter dap = new MySqlDataAdapter(Sql, connection);
+            dap.Fill(ds);
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+
+                id = int.Parse(dr["usersId"].ToString());
+
+            }
+            connection.Close();
+            return id;
+        }
+    }
+}

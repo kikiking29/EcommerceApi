@@ -8,4 +8,11 @@
         public DateTime o_datetime { get; set; }
         public string? o_status { get; set; }
     }
+    public class  newordersModels
+    {
+        public int id_users { get; set; }
+        public int o_total { get; set; }
+        public DateTime o_datetime { get; set; }
+        public string? o_status { get; set; }
+    }
 }
