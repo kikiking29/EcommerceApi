@@ -6,10 +6,10 @@ namespace EcommerceApi.ConnecDB
 {
     public class ConnecDb
     {
-        string connectionstring = "Server=localhost;Database=userinformation;Uid=root;Pwd=1234;";
+        string connectionstring = "Server=localhost;Database=hauntshop;Uid=root;Pwd=1234;";
         public string connectDb()
         {
-            string connectionString = "Server=localhost;Database=userinformation;Uid=root;Pwd=1234;";
+            string connectionString = "Server=localhost;Database=hauntshop;Uid=root;Pwd=1234;";
             return connectionString;
         }
 
@@ -57,17 +57,37 @@ namespace EcommerceApi.ConnecDB
             MySqlConnection connection = new MySqlConnection(connectionstring);
             DataSet ds = new DataSet();
             connection.Open();
-            string Sql = "SELECT usersId FROM users where username='" + data.Username + "'AND passwrd=CONCAT('*', UPPER(SHA1(UNHEX(SHA1('" + data.Password + "')))));";
+            string Sql = "SELECT id_users FROM users where u_usersname='" + data.Username + "'AND u_password=CONCAT('*', UPPER(SHA1(UNHEX(SHA1('" + data.Password + "')))));";
             MySqlDataAdapter dap = new MySqlDataAdapter(Sql, connection);
             dap.Fill(ds);
             foreach (DataRow dr in ds.Tables[0].Rows)
             {
 
-                id = int.Parse(dr["usersId"].ToString());
+                id = int.Parse(dr["id_users"].ToString());
 
             }
             connection.Close();
             return id;
+        }
+        public string getRole(UserDto data)
+        {
+            int id = 0;
+            PasswordModels passwrd = new PasswordModels();
+            MySqlConnection connection = new MySqlConnection(connectionstring);
+            DataSet ds = new DataSet();
+            connection.Open();
+            string Sql = "SELECT u_role FROM users where u_usersname='" + data.Username + "'AND u_password=CONCAT('*', UPPER(SHA1(UNHEX(SHA1('" + data.Password + "')))));";
+            MySqlDataAdapter dap = new MySqlDataAdapter(Sql, connection);
+            dap.Fill(ds);
+            string u_role = "";
+            foreach (DataRow dr in ds.Tables[0].Rows)
+            {
+
+                u_role = dr["u_role"].ToString();
+
+            }
+            connection.Close();
+            return u_role;
         }
     }
 }

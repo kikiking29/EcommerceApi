@@ -5,6 +5,7 @@ using EcommerceApi.Models;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using EcommerceApi.ConnecDB;
+using EcommerceApi;
 
 
 using AllowAnonymousAttribute = Microsoft.AspNetCore.Authorization.AllowAnonymousAttribute;
@@ -18,9 +19,13 @@ namespace JwtWebApiTutorial.Controllers
     public class authCol : ControllerBase
     {
         private const string TicketIssuedTicks = nameof(TicketIssuedTicks);
+        public class myParam
+        {
+            public string name;
+            public object value;
+        }
 
-
-        public static User user = new User();
+        public static Users user = new Users();
         PasswordModels pass = new PasswordModels();
         ConnecDb conn = new ConnecDb();
         private readonly IConfiguration _configuration;
@@ -45,8 +50,8 @@ namespace JwtWebApiTutorial.Controllers
             user.Username = request.Username;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-
-            if (pass == null)
+            user.Role = conn.getRole(request);
+            if (user.UserId == 0)
             {
                 return BadRequest("User not found.");
             }
@@ -112,12 +117,13 @@ namespace JwtWebApiTutorial.Controllers
             user.TokenExpires = newRefreshToken.Expires;
         }
 
-        private string CreateToken(User user)
+        private string CreateToken(Users user)
         {
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration.GetSection("AppSettings:Token").Value));
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha384);
-
+           
+            
             var token = new JwtSecurityToken(
                 issuer: _configuration["AppSettings:Issuer"],
                 audience: _configuration["AppSettings:Audience"],

@@ -9,6 +9,7 @@
         public int s_amongall { get; set; }
         public int s_unitprice { get; set; }
         public string? s_description { get; set; }
+        public string? s_status { get; set; }
 
     }
     public class newstockModels
@@ -19,6 +20,7 @@
         public int s_amongall { get; set; }
         public int s_unitprice { get; set; }
         public string? s_description { get; set; }
+        public string? s_status { get; set; }
 
     }
 }

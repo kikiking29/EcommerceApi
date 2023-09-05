@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static EcommerceApi.Controllers.userControllers;
 
 namespace EcommerceApi.Controllers
 {
@@ -22,7 +21,11 @@ namespace EcommerceApi.Controllers
     public class addressCol : ControllerBase
     {
         ConnecDb conn = new ConnecDb();
-
+        public class myParam
+        {
+            public string name;
+            public object value;
+        }
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
@@ -44,6 +47,7 @@ namespace EcommerceApi.Controllers
                         id_users = int.Parse(dr["id_users"].ToString()),
                         a_province = dr["a_province"].ToString(),
                         a_district = dr["a_district"].ToString(),
+                        a_subdistrict = dr["a_subdistrict"].ToString(),
                         a_postalcode = int.Parse(dr["a_postalcode"].ToString()) ,
                         a_streetname = dr["a_streetname"].ToString(),
                         a_building = dr["a_building"].ToString(),
@@ -75,7 +79,7 @@ namespace EcommerceApi.Controllers
 
 
                 DataSet ds = new DataSet();
-                ds = conn.Selectdata("SELECT * FROM address WHERE id_address='" +id+ "';");
+                ds = conn.Selectdata($"SELECT * FROM address WHERE id_address={id};");
 
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
@@ -86,6 +90,7 @@ namespace EcommerceApi.Controllers
                         id_users = int.Parse(dr["id_users"].ToString()),
                         a_province = dr["a_province"].ToString(),
                         a_district = dr["a_district"].ToString(),
+                        a_subdistrict = dr["a_subdistrict"].ToString(),
                         a_postalcode = int.Parse(dr["a_postalcode"].ToString()),
                         a_streetname = dr["a_streetname"].ToString(),
                         a_building = dr["a_building"].ToString(),
@@ -119,20 +124,21 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string setAddress = "INSERT into address set id_users=@id_users,a_province=@a_province,a_district=@a_district,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details;";
-                    MySqlCommand commads = new MySqlCommand(setAddress, connection);
-                    commads.Parameters.AddWithValue("@id_users", data.id_users);
-                    commads.Parameters.AddWithValue("@a_province", data.a_province);
-                    commads.Parameters.AddWithValue("@a_district", data.a_district);
-                    commads.Parameters.AddWithValue("@a_postalcode", data.a_postalcode);
-                    commads.Parameters.AddWithValue("@a_streetname", data.a_streetname);
-                    commads.Parameters.AddWithValue("@a_building", data.a_building);
-                    commads.Parameters.AddWithValue("@a_housenumber", data.a_housenumber);
-                    commads.Parameters.AddWithValue("@a_alley", data.a_alley);
-                    commads.Parameters.AddWithValue("@a_intersection", data.a_intersection);
-                    commads.Parameters.AddWithValue("@a_locationurl", data.a_locationurl);
-                    commads.Parameters.AddWithValue("@a_details", data.a_locationurl);
-                    commads.ExecuteNonQuery();
+                    string sql = "INSERT into address set id_users=@id_users,a_province=@a_province,a_district=@a_district,a_subdistrict=@a_subdistrict,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details;";
+                    MySqlCommand comm = new MySqlCommand(sql, connection);
+                    comm.Parameters.AddWithValue("@id_users", data.id_users);
+                    comm.Parameters.AddWithValue("@a_province", data.a_province);
+                    comm.Parameters.AddWithValue("@a_district", data.a_district);
+                    comm.Parameters.AddWithValue("@a_subdistrict", data.a_subdistrict);
+                    comm.Parameters.AddWithValue("@a_postalcode", data.a_postalcode);
+                    comm.Parameters.AddWithValue("@a_streetname", data.a_streetname);
+                    comm.Parameters.AddWithValue("@a_building", data.a_building);
+                    comm.Parameters.AddWithValue("@a_housenumber", data.a_housenumber);
+                    comm.Parameters.AddWithValue("@a_alley", data.a_alley);
+                    comm.Parameters.AddWithValue("@a_intersection", data.a_intersection);
+                    comm.Parameters.AddWithValue("@a_locationurl", data.a_locationurl);
+                    comm.Parameters.AddWithValue("@a_details", data.a_details);
+                    comm.ExecuteNonQuery();
                     connection.Close();
 
                 }
@@ -147,6 +153,7 @@ namespace EcommerceApi.Controllers
                 id_users = data.id_users,
                 a_province = data.a_province,
                 a_district = data.a_district,
+                a_subdistrict = data.a_subdistrict,
                 a_postalcode = data.a_postalcode,
                 a_streetname = data.a_streetname,
                 a_building = data.a_building,
@@ -173,12 +180,13 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE address SET  id_users=@id_users,a_province=@a_province,a_district=@a_district,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details WHERE id_address=@id_address;";
+                    string sql = "UPDATE address SET  id_users=@id_users,a_province=@a_province,a_district=@a_district,a_subdistrict=@a_subdistrict,a_postalcode=@a_postalcode,a_streetname=@a_streetname,a_building=@a_building,a_housenumber=@a_housenumber,a_alley=@a_alley,a_intersection=@a_intersection,a_locationurl=@a_locationurl,a_details=@a_details WHERE id_address=@id_address;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_address", data.id_address);
                     comm.Parameters.AddWithValue("@id_users", data.id_users);
                     comm.Parameters.AddWithValue("@a_province", data.a_province);
                     comm.Parameters.AddWithValue("@a_district", data.a_district);
+                    comm.Parameters.AddWithValue("@a_subdistrict", data.a_subdistrict);
                     comm.Parameters.AddWithValue("@a_postalcode", data.a_postalcode);
                     comm.Parameters.AddWithValue("@a_streetname", data.a_streetname);
                     comm.Parameters.AddWithValue("@a_building", data.a_building);
@@ -199,6 +207,7 @@ namespace EcommerceApi.Controllers
                 id_users = data.id_users,
                 a_province = data.a_province,
                 a_district = data.a_district,
+                a_subdistrict = data.a_subdistrict,
                 a_postalcode = data.a_postalcode,
                 a_streetname = data.a_streetname,
                 a_building = data.a_building,

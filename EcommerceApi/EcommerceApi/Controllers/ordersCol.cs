@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static EcommerceApi.Controllers.userControllers;
 
 namespace EcommerceApi.Controllers
 {
@@ -22,7 +21,11 @@ namespace EcommerceApi.Controllers
     public class ordersCol : ControllerBase
     {
         ConnecDb conn = new ConnecDb();
-
+        public class myParam
+        {
+            public string name;
+            public object value;
+        }
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]

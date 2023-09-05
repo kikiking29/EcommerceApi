@@ -18,10 +18,9 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 namespace EcommerceApi.Controllers
 {
 
-    public class paymentCol : ControllerBase
+    public class shopsCol : ControllerBase
     {
         ConnecDb conn = new ConnecDb();
-        
         public class myParam
         {
             public string name;
@@ -30,60 +29,61 @@ namespace EcommerceApi.Controllers
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
-        [Route("Payment")]
-        public List<paymentModels> Getpaymentdataall()
+        [Route("Shops")]
+        public List<shopsModels> Getshopsdataall()
         {
 
-            List<paymentModels> cats = new List<paymentModels>();
+            List<shopsModels> shopss = new List<shopsModels>();
             try
             {
                 DataSet ds = new DataSet();
-                ds = conn.Selectdata("SELECT * FROM payment;");
+                ds = conn.Selectdata("SELECT * FROM shops;");
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    paymentModels cat = new paymentModels()
+                    shopsModels shops = new shopsModels()
                     {
-                        id_payment = int.Parse(dr["id_payment"].ToString()),
+                        id_shops = int.Parse(dr["id_shops"].ToString()),
                         id_users = int.Parse(dr["id_users"].ToString()),
-                        id_orders = int.Parse(dr["id_orders"].ToString()),
-                        p_datetime = DateTime.Parse(dr["p_datetime"].ToString()),
-                        p_status = dr["p_status"].ToString(),
+                        sh_name = dr["sh_name"].ToString(),
+                        sh_type = dr["sh_type"].ToString(),
+                        sh_description = dr["sh_description"].ToString(),
                     };
-                    cats.Add(cat);
+                    shopss.Add(shops);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            return cats;
+            return shopss;
         }
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
-        [Route("Payment/{id}")]
-        public paymentModels Getbypaymentid(int id)
+        [Route("Shops/{id}")]
+        public shopsModels Getbyshopsid(int id)
         {
-            paymentModels pay = new paymentModels();
+            shopsModels shops = new shopsModels();
 
             try
             {
 
 
                 DataSet ds = new DataSet();
-                ds = conn.Selectdata("SELECT * FROM payment WHERE id_payment='" + id+ "';");
+                ds = conn.Selectdata("SELECT * FROM shops WHERE id_shops='" + id+ "';");
 
 
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    pay = new paymentModels()
+                    shops = new shopsModels()
                     {
-                        id_payment = int.Parse(dr["id_payment"].ToString()),
+                        id_shops = int.Parse(dr["id_shops"].ToString()),
                         id_users = int.Parse(dr["id_users"].ToString()),
-                        id_orders = int.Parse(dr["id_orders"].ToString()),
-                        p_datetime = DateTime.Parse(dr["p_datetime"].ToString()),
-                        p_status = dr["p_status"].ToString(),
+                        sh_name = dr["sh_name"].ToString(),
+                        sh_type = dr["sh_type"].ToString(),
+                        sh_description = dr["sh_description"].ToString(),
+
                     };
                 }
             }
@@ -91,13 +91,14 @@ namespace EcommerceApi.Controllers
             {
                 Console.WriteLine(ex.Message);
             }
-            return pay;
+            return shops;
         }
 
 
+        [Authorize(Roles = "Admin,SuperAdmin,User")]
         [HttpPost]
-        [Route("Payment")]
-        public newpaymentModels Newpayment(newpaymentModels data)
+        [Route("Shops")]
+        public newshopsModels Newshops(newshopsModels data)
         {
             ConnecDb conn = new ConnecDb();
 
@@ -107,15 +108,13 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "INSERT into payment set id_users=@id_users,id_orders=@id_orders,p_datetime=@p_datetime,p_status=@p_status;";
-                    MySqlCommand comm = new MySqlCommand(sql, connection);
-                    comm.Parameters.AddWithValue("@id_users", data.id_users);
-                    comm.Parameters.AddWithValue("@id_orders", data.id_orders);
-                    comm.Parameters.AddWithValue("@p_datetime", data.p_datetime);
-                    comm.Parameters.AddWithValue("@p_status", data.p_status);
-
-
-                    comm.ExecuteNonQuery();
+                    string setAddress = "INSERT into shops set id_users=@id_users,sh_name=@sh_name,sh_type=@sh_type,sh_description=@sh_description;";
+                    MySqlCommand commads = new MySqlCommand(setAddress, connection);
+                    commads.Parameters.AddWithValue("@id_users", data.id_users);
+                    commads.Parameters.AddWithValue("@sh_name", data.sh_name);
+                    commads.Parameters.AddWithValue("@sh_type", data.sh_type);
+                    commads.Parameters.AddWithValue("@sh_description", data.sh_description);
+                    commads.ExecuteNonQuery();
                     connection.Close();
 
                 }
@@ -125,61 +124,59 @@ namespace EcommerceApi.Controllers
                 Console.WriteLine(ex.Message);
             }
 
-            return new newpaymentModels
+            return new newshopsModels
             {
                 id_users = data.id_users,
-                id_orders = data.id_orders,
-                p_datetime = data.p_datetime,   
-                p_status = data.p_status,
+                sh_name = data.sh_name,
+                sh_type = data.sh_type,
+                sh_description = data.sh_description
             };
         }
 
         [Authorize(Roles = "Admin,SuperAdmin,User")]
         [HttpPut]
-        [Route("Payment/{id}")]
-        public paymentModels Updatepayment(paymentModels data)
+        [Route("Shops/{id}")]
+        public shopsModels Updateshops(shopsModels data)
         {
-            paymentModels user = new paymentModels();
             ConnecDb conn = new ConnecDb();
             try
             {
-
-
                 if (ModelState.IsValid)
                 {
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE payment SET id_users=@id_users,id_orders=@id_orders,p_datetime=@p_datetime,p_status=@p_status WHERE id_payment=@id_payment;";
+                    string sql = "UPDATE shops SET id_users=@id_users,sh_name=@sh_name,sh_type=@sh_type,sh_description=@sh_description WHERE id_shops=@id_shops;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
-                    comm.Parameters.AddWithValue("@id_payment", data.id_payment);
+                    comm.Parameters.AddWithValue("@id_shops", data.id_shops);
                     comm.Parameters.AddWithValue("@id_users", data.id_users);
-                    comm.Parameters.AddWithValue("@id_orders", data.id_orders);
-                    comm.Parameters.AddWithValue("@p_datetime", data.p_datetime);
-                    comm.Parameters.AddWithValue("@p_status", data.p_status);
+                    comm.Parameters.AddWithValue("@sh_name", data.sh_name);
+                    comm.Parameters.AddWithValue("@sh_type",data.sh_type);
+                    comm.Parameters.AddWithValue("@sh_description", data.sh_description);
                     comm.ExecuteNonQuery();
                     connection.Close();
                 }
             }
             catch (Exception ex) { Console.WriteLine(ex.Message); }
 
-            return new paymentModels
+            return new shopsModels
             {
-                id_payment = data.id_payment,
+                id_shops = data.id_shops,
                 id_users = data.id_users,
-                id_orders = data.id_orders,
-                p_datetime = data.p_datetime,
-                p_status = data.p_status,
+                sh_name = data.sh_name,
+                sh_type = data.sh_type,
+                sh_description = data.sh_description           
 
             };
 
         }
 
 
+       
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpDelete]
-        [Route("Payment/{id}")]
-        public void Deletecategoty(int id)
+        [Route("Shops/{id}")]
+        public void Deleteshops(int id)
         {
             try
             {
@@ -188,7 +185,7 @@ namespace EcommerceApi.Controllers
                     name = "@id",
                     value = id
                 };
-                string sql = $"DELETE payment  WHERE id_payment={uId.value};";
+                string sql = $"DELETE shops  WHERE id_shops={uId.value};";
                 conn.Setdata(sql);
             }
             catch (Exception ex)

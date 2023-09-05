@@ -6,6 +6,7 @@
         public int id_users { get; set; }
         public string? a_province { get; set; }
         public string? a_district { get; set; }
+        public string? a_subdistrict { get; set; }
         public int a_postalcode { get; set; }
         public string? a_streetname { get; set; }
         public string? a_building { get; set; }
@@ -19,9 +20,10 @@
     {
         public int id_users { get; set; }
         public string? a_province { get; set; }
-        public int a_district { get; set; }
+        public string? a_district { get; set; }
+        public string? a_subdistrict { get; set; }
         public int a_postalcode { get; set; }
-        public int a_streetname { get; set; }
+        public string? a_streetname { get; set; }
         public string? a_building { get; set; }
         public string? a_housenumber { get; set; }
         public string? a_alley { get; set; }

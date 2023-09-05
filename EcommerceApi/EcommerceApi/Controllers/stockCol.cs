@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Text.RegularExpressions;
 using System.Security.Claims;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static EcommerceApi.Controllers.userControllers;
 
 namespace EcommerceApi.Controllers
 {
@@ -22,7 +21,11 @@ namespace EcommerceApi.Controllers
     public class stockCol : ControllerBase
     {
         ConnecDb conn = new ConnecDb();
-
+        public class myParam
+        {
+            public string name;
+            public object value;
+        }
 
         [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpGet]
@@ -47,6 +50,8 @@ namespace EcommerceApi.Controllers
                         s_amongall = int.Parse(dr["s_amongall"].ToString()),
                         s_unitprice = int.Parse(dr["s_unitprice"].ToString()),
                         s_description = dr["s_description"].ToString(),
+                        s_status = dr["s_status"].ToString(),
+
                     };
                     stocks.Add(stock);
                 }
@@ -84,6 +89,7 @@ namespace EcommerceApi.Controllers
                         s_amongall = int.Parse(dr["s_amongall"].ToString()),
                         s_unitprice = int.Parse(dr["s_unitprice"].ToString()),
                         s_description = dr["s_description"].ToString(),
+                        s_status = dr["s_status"].ToString(),
 
                     };
                 }
@@ -108,15 +114,16 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string setAddress = "INSERT into stock set id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description;";
-                    MySqlCommand commads = new MySqlCommand(setAddress, connection);
-                    commads.Parameters.AddWithValue("@id_category", data.id_category);
-                    commads.Parameters.AddWithValue("@s_name", data.s_name);
-                    commads.Parameters.AddWithValue("@s_among", data.s_among);
-                    commads.Parameters.AddWithValue("@s_amongall", data.s_amongall);
-                    commads.Parameters.AddWithValue("@s_unitprice", data.s_unitprice);
-                    commads.Parameters.AddWithValue("@s_description", data.s_description);
-                    commads.ExecuteNonQuery();
+                    string sql = "INSERT into stock set id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description,s_status=@s_status;";
+                    MySqlCommand comm = new MySqlCommand(sql, connection);
+                    comm.Parameters.AddWithValue("@id_category", data.id_category);
+                    comm.Parameters.AddWithValue("@s_name", data.s_name);
+                    comm.Parameters.AddWithValue("@s_among", data.s_among);
+                    comm.Parameters.AddWithValue("@s_amongall", data.s_amongall);
+                    comm.Parameters.AddWithValue("@s_unitprice", data.s_unitprice);
+                    comm.Parameters.AddWithValue("@s_description", data.s_description);
+                    comm.Parameters.AddWithValue("@s_status", data.s_description);
+                    comm.ExecuteNonQuery();
                     connection.Close();
 
                 }
@@ -151,7 +158,7 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE stock SET id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description WHERE id_stock=@id_stock;";
+                    string sql = "UPDATE stock SET id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description ,s_status=@s_status WHERE id_stock=@id_stock;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_stock", data.id_stock);
                     comm.Parameters.AddWithValue("@id_category", data.id_category);
@@ -160,6 +167,7 @@ namespace EcommerceApi.Controllers
                     comm.Parameters.AddWithValue("@s_amongall", data.s_amongall);
                     comm.Parameters.AddWithValue("@s_unitprice", data.s_unitprice);
                     comm.Parameters.AddWithValue("@s_description", data.s_description);
+                    comm.Parameters.AddWithValue("@s_status", data.s_description);
                     comm.ExecuteNonQuery();
                     connection.Close();
                 }
@@ -175,6 +183,7 @@ namespace EcommerceApi.Controllers
                 s_amongall = data.s_amongall,
                 s_unitprice = data.s_unitprice,
                 s_description = data.s_description,
+                s_status = data.s_status,
 
             };
 
