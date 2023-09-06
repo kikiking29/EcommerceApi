@@ -108,12 +108,11 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string setAddress = "INSERT into orders set id_users=@id_users,o_total=@o_total,o_datetime=@o_datetime,o_status=@o_status;";
+                    string setAddress = "INSERT into orders set id_users=@id_users,o_datetime=@o_datetime,o_status=@o_status;";
                     MySqlCommand commads = new MySqlCommand(setAddress, connection);
-                    commads.Parameters.AddWithValue("@id_users", data.id_users);
-                    commads.Parameters.AddWithValue("@o_total", data.o_total);
+                    commads.Parameters.AddWithValue("@id_users", User.FindFirstValue(ClaimTypes.Sid));
                     commads.Parameters.AddWithValue("@o_datetime",DateTime.Now);
-                    commads.Parameters.AddWithValue("@o_status", data.o_status);
+                    commads.Parameters.AddWithValue("@o_status","Shopping");
                     commads.ExecuteNonQuery();
                     connection.Close();
 
@@ -127,7 +126,6 @@ namespace EcommerceApi.Controllers
             return new newordersModels
             {
                 id_users = data.id_users,
-                o_total = data.o_total,
                 o_datetime = data.o_datetime,
                 o_status = data.o_status
             };
@@ -146,13 +144,11 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE orders SET id_users=@id_users,o_total=@o_total,o_datetime=@o_datetime,o_status=@o_status WHERE id_orders=@id_orders;";
+                    string sql = "UPDATE orders SET id_users=@id_users,o_datetime=@o_datetime WHERE id_orders=@id_orders;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_orders", data.id_orders);
                     comm.Parameters.AddWithValue("@id_users", data.id_users);
-                    comm.Parameters.AddWithValue("@o_total", data.o_total);
                     comm.Parameters.AddWithValue("@o_datetime",DateTime.Now);
-                    comm.Parameters.AddWithValue("@o_status", data.o_status);
                     comm.ExecuteNonQuery();
                     connection.Close();
                 }
@@ -163,34 +159,54 @@ namespace EcommerceApi.Controllers
             {
                 id_orders = data.id_orders,
                 id_users = data.id_users,
-                o_total = data.o_total,
-                o_datetime = data.o_datetime,
-                o_status = data.o_status           
+                o_datetime = data.o_datetime      
 
             };
 
         }
 
-
        
-        [Authorize(Roles = "Admin,SuperAdmin")]
-        [HttpDelete]
-        [Route("Orders/{id}")]
-        public void Deleteorders(int id)
+        [Authorize(Roles = "Admin,SuperAdmin,User")]
+        [HttpPut]
+        [Route("Orders/Cancel")]
+        public void Cancelorders(int id)
         {
             try
-            {
-                myParam uId = new myParam
-                {
-                    name = "@id",
-                    value = id
-                };
-                string sql = $"DELETE orders  WHERE id_orders={uId.value};";
+            {                
+                string sql = $"UPDATE orders set o_status='Cancel' WHERE id_orders={id};";
                 conn.Setdata(sql);
             }
             catch (Exception ex)
             { Console.WriteLine(ex.Message); }
 
+        }
+
+        [Authorize(Roles = "Admin,SuperAdmin,")]
+        [HttpPut]
+        [Route("Orders/Canceled")]
+        public void confirmCancelorders(int id)
+        {
+            try
+            {
+                string sql = $"UPDATE orders set o_status='Canceled' WHERE id_orders={id};";
+                conn.Setdata(sql);
+            }
+            catch (Exception ex)
+            { Console.WriteLine(ex.Message); }
+        }
+
+        [Authorize(Roles = "Admin,SuperAdmin")]
+        [HttpPut]
+        [Route("Orders/Shopping")]
+        public void reCancelorders(int id)
+        {
+            try
+            {
+                string sql = $"UPDATE orders set o_status='Shopping' WHERE id_orders={id};";
+                conn.Setdata(sql);
+            }
+            catch (Exception ex)
+            { Console.WriteLine(ex.Message); }
         }
 
 

@@ -44,6 +44,7 @@ namespace EcommerceApi.Controllers
                     stockModels stock = new stockModels()
                     {
                         id_stock = int.Parse(dr["id_stock"].ToString()),
+                        id_shops = int.Parse(dr["id_shops"].ToString()),
                         id_category = int.Parse(dr["id_category"].ToString()),
                         s_name = dr["s_name"].ToString(),
                         s_among = int.Parse(dr["s_among"].ToString()),
@@ -83,6 +84,7 @@ namespace EcommerceApi.Controllers
                     stock = new stockModels()
                     {
                         id_stock = int.Parse(dr["id_stock"].ToString()),
+                        id_shops = int.Parse(dr["id_shops"].ToString()),
                         id_category = int.Parse(dr["id_category"].ToString()),
                         s_name = dr["s_name"].ToString(),
                         s_among = int.Parse(dr["s_among"].ToString()),
@@ -114,8 +116,9 @@ namespace EcommerceApi.Controllers
                 {
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "INSERT into stock set id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description,s_status=@s_status;";
+                    string sql = "INSERT into stock set id_shops=@id_shops,id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description,s_status=@s_status;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
+                    comm.Parameters.AddWithValue("@id_shops", data.id_shops);
                     comm.Parameters.AddWithValue("@id_category", data.id_category);
                     comm.Parameters.AddWithValue("@s_name", data.s_name);
                     comm.Parameters.AddWithValue("@s_among", data.s_among);
@@ -135,6 +138,7 @@ namespace EcommerceApi.Controllers
 
             return new newstockModels
             {
+                id_shops = data.id_shops,
                 id_category = data.id_category,
                 s_name = data.s_name,
                 s_among = data.s_among,
@@ -158,9 +162,10 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE stock SET id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description ,s_status=@s_status WHERE id_stock=@id_stock;";
+                    string sql = "UPDATE stock SET id_shops=@id_shops,id_category=@id_category,s_name=@s_name,s_among=@s_among,s_amongall=@s_amongall,s_unitprice=@s_unitprice,s_description=@s_description ,s_status=@s_status WHERE id_stock=@id_stock;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_stock", data.id_stock);
+                    comm.Parameters.AddWithValue("@id_shops", data.id_shops);
                     comm.Parameters.AddWithValue("@id_category", data.id_category);
                     comm.Parameters.AddWithValue("@s_name", data.s_name);
                     comm.Parameters.AddWithValue("@s_among", data.s_among);
@@ -177,6 +182,7 @@ namespace EcommerceApi.Controllers
             return new stockModels
             {
                 id_stock = data.id_stock,
+                id_shops = data.id_shops,
                 id_category = data.id_category,
                 s_name = data.s_name,
                 s_among = data.s_among,

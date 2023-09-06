@@ -103,7 +103,7 @@ namespace EcommerceApi.Controllers
         public neworderdetailsModels Neworderdetails(neworderdetailsModels data)
         {
             ConnecDb conn = new ConnecDb();
-
+            production pdt = new production();
             try
             {
                 if (ModelState.IsValid)
@@ -113,10 +113,10 @@ namespace EcommerceApi.Controllers
                     string sql = "INSERT into orderdetails set id_orders=@id_orders,id_users=@id_users,id_stock=@id_stock,odt_among=@odt_among,odt_totalprice=@odt_totalprice,odt_datetime=@odt_datetime;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_orders", data.id_orders);
-                    comm.Parameters.AddWithValue("@id_users", data.id_users);
+                    comm.Parameters.AddWithValue("@id_users", User.FindFirstValue(ClaimTypes.Sid));
                     comm.Parameters.AddWithValue("@id_stock",data.id_stock);
                     comm.Parameters.AddWithValue("@odt_among", data.odt_among);
-                    comm.Parameters.AddWithValue("@odt_totalprice", data.odt_totalprice);
+                    comm.Parameters.AddWithValue("@odt_totalprice", (data.odt_among*pdt.getUnitprice(data.id_stock)));
                     comm.Parameters.AddWithValue("@odt_datetime", DateTime.Now);
                     comm.ExecuteNonQuery();
                     connection.Close();

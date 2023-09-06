@@ -3,6 +3,7 @@
     public class stockModels
     {
         public int id_stock  { get; set; }
+        public int id_shops { get; set; }
         public int id_category { get; set; }
         public string? s_name { get; set; }
         public int s_among { get; set; }
@@ -14,6 +15,8 @@
     }
     public class newstockModels
     {
+
+        public int id_shops { get; set; }
         public int id_category { get; set; }
         public string? s_name { get; set; }
         public int s_among { get; set; }
