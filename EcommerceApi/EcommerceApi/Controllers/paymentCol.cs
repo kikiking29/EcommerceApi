@@ -95,6 +95,7 @@ namespace EcommerceApi.Controllers
         }
 
 
+        [Authorize(Roles = "Admin,SuperAdmin,User")]
         [HttpPost]
         [Route("Payment")]
         public newpaymentModels Newpayment(newpaymentModels data)
@@ -109,10 +110,10 @@ namespace EcommerceApi.Controllers
                     connection.Open();
                     string sql = "INSERT into payment set id_users=@id_users,id_orders=@id_orders,p_datetime=@p_datetime,p_status=@p_status;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
-                    comm.Parameters.AddWithValue("@id_users", data.id_users);
+                    comm.Parameters.AddWithValue("@id_users", User.FindFirstValue(ClaimTypes.Sid));
                     comm.Parameters.AddWithValue("@id_orders", data.id_orders);
-                    comm.Parameters.AddWithValue("@p_datetime", data.p_datetime);
-                    comm.Parameters.AddWithValue("@p_status", data.p_status);
+                    comm.Parameters.AddWithValue("@p_datetime",DateTime.Now);
+                    comm.Parameters.AddWithValue("@p_status", "Paying");
 
 
                     comm.ExecuteNonQuery();
@@ -127,17 +128,17 @@ namespace EcommerceApi.Controllers
 
             return new newpaymentModels
             {
-                id_users = data.id_users,
+                id_users = User.FindFirstValue(ClaimTypes.Sid),
                 id_orders = data.id_orders,
                 p_datetime = data.p_datetime,   
                 p_status = data.p_status,
             };
         }
 
-        [Authorize(Roles = "Admin,SuperAdmin,User")]
+        [Authorize(Roles = "Admin,SuperAdmin")]
         [HttpPut]
         [Route("Payment/{id}")]
-        public paymentModels Updatepayment(paymentModels data)
+        public paymentModels UpdatepaymentbyAdmin(paymentModels data)
         {
             paymentModels user = new paymentModels();
             ConnecDb conn = new ConnecDb();
@@ -150,13 +151,51 @@ namespace EcommerceApi.Controllers
 
                     MySqlConnection connection = new MySqlConnection(conn.connectDb());
                     connection.Open();
-                    string sql = "UPDATE payment SET id_users=@id_users,id_orders=@id_orders,p_datetime=@p_datetime,p_status=@p_status WHERE id_payment=@id_payment;";
+                    string sql = "UPDATE payment SET id_users=@id_users,id_orders=@id_orders,p_status=@p_status WHERE id_payment=@id_payment;";
                     MySqlCommand comm = new MySqlCommand(sql, connection);
                     comm.Parameters.AddWithValue("@id_payment", data.id_payment);
                     comm.Parameters.AddWithValue("@id_users", data.id_users);
                     comm.Parameters.AddWithValue("@id_orders", data.id_orders);
-                    comm.Parameters.AddWithValue("@p_datetime", data.p_datetime);
                     comm.Parameters.AddWithValue("@p_status", data.p_status);
+                    comm.ExecuteNonQuery();
+                    connection.Close();
+                }
+            }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+            return new paymentModels
+            {
+                id_payment = data.id_payment,
+                id_users = data.id_users,
+                id_orders = data.id_orders,
+                p_datetime = data.p_datetime,
+                p_status = data.p_status,
+
+            };
+
+        }
+
+
+
+        [Authorize(Roles = "Admin,SuperAdmin,User")]
+        [HttpPut]
+        [Route("Payment/{id}")]
+        public paymentModels Updatepayment(paymentModels data)
+        {
+            paymentModels user = new paymentModels();
+            ConnecDb conn = new ConnecDb();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+
+                    MySqlConnection connection = new MySqlConnection(conn.connectDb());
+                    connection.Open();
+                    string sql = "UPDATE payment SET id_users=@id_users,id_orders=@id_orders,p_datetime=@p_datetime,p_status=@p_status WHERE id_payment=@id_payment;";
+                    MySqlCommand comm = new MySqlCommand(sql, connection);
+                    comm.Parameters.AddWithValue("@id_payment", data.id_payment);
+                    comm.Parameters.AddWithValue("@id_orders", data.id_orders);
+                    comm.Parameters.AddWithValue("@p_datetime", DateTime.Now);
                     comm.ExecuteNonQuery();
                     connection.Close();
                 }
